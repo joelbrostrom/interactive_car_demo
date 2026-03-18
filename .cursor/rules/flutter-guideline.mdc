@@ -1,0 +1,94 @@
+---
+description: Flutter rules optimized for rapid prototyping and vibe coding demos
+globs:
+alwaysApply: true
+---
+# Vibe Coding Rules for Flutter
+
+Prioritize speed of iteration over production-grade architecture. These rules are
+designed for quick prototyping and demonstrations.
+
+## Project structure
+
+* Keep it simple: all code lives in `lib/` with a flat or shallow structure.
+* Single entry point: `lib/main.dart`.
+* Create feature folders only when a feature has multiple files (e.g.
+  `lib/chat/`, `lib/profile/`).
+* No monorepo packages unless explicitly requested.
+* Prefer fewer files over many small files.
+
+## State management
+
+* Use `setState` for simple local state.
+* Use `Provider` or `Riverpod` for shared state when needed.
+* Avoid complex patterns like BLoC unless explicitly requested.
+* Inline state logic is acceptable for demos.
+
+## Code style
+
+* Prioritize working code over perfect code.
+* Hardcoded values and magic numbers are fine for prototypes.
+* Inline styles are acceptable—no need to extract everything to theme.
+* Skip `const` constructors if they slow you down.
+* Use `print()` for quick debugging.
+
+## Backend (Supabase)
+
+* Supabase is pre-configured in `lib/supabase_config.dart`.
+* Import `supabase_config.dart` and use the `supabase` getter for quick access.
+* Use Supabase for database, auth, and storage needs.
+* Create tables directly in the Supabase dashboard during demos.
+* Skip Row Level Security (RLS) for prototypes—enable it for production later.
+
+Example patterns:
+```dart
+// Fetch all rows
+final data = await supabase.from('items').select();
+
+// Insert a row
+await supabase.from('items').insert({'name': 'New item'});
+
+// Real-time subscription
+supabase.from('items').stream(primaryKey: ['id']).listen((data) {
+  print('Updated: $data');
+});
+```
+
+## Dependencies
+
+* Add packages freely with `flutter pub add <package>`.
+* Use `any` version constraints for speed (avoid version hunting).
+* Common useful packages: `http`, `provider`, `google_fonts`, `url_launcher`.
+
+## Testing
+
+* Skip tests unless explicitly requested.
+* Focus on making features work first.
+
+## Error handling
+
+* Basic try-catch is sufficient.
+* Show simple error messages to users.
+* Don't over-engineer error states for demos.
+
+## UI practices
+
+* Build UI quickly—pixel perfection comes later.
+* Use Material 3 defaults for consistent look.
+* Copy-paste and adapt is faster than abstracting.
+* Scaffold with AppBar is a good default starting point.
+
+## What NOT to do
+
+* Don't set up multiple environment entry points.
+* Don't create abstract base classes for simple features.
+* Don't add code generation (freezed, json_serializable) unless needed.
+* Don't write tests proactively.
+* Don't refactor working code for "cleanliness".
+
+## AI assistant behavior
+
+* Implement features directly without asking for clarification on minor details.
+* Prefer complete working examples over partial snippets.
+* When in doubt, pick the simpler approach.
+* Iterate quickly based on feedback rather than planning extensively.
