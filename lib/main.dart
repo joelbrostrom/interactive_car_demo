@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'supabase_config.dart';
 import 'auth/auth_page.dart';
-import 'home/car_status_page.dart';
 import 'details/car_details_page.dart';
+import 'home/car_status_page.dart';
 import 'shop/shop_page.dart';
+import 'supabase_config.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,27 +35,52 @@ class MainApp extends StatelessWidget {
   }
 }
 
-class AuthGate extends StatelessWidget {
+class AuthGate extends StatefulWidget {
   const AuthGate({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<AuthState>(
-      stream: supabase.auth.onAuthStateChange,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
+  State<AuthGate> createState() => _AuthGateState();
+}
 
-        final session = snapshot.data?.session;
-        if (session != null) {
-          return const AppShell();
-        }
-        return const AuthPage();
-      },
-    );
+class _AuthGateState extends State<AuthGate> {
+  bool _isLoading = true;
+  Session? _session;
+
+  @override
+  void initState() {
+    super.initState();
+    _initSession();
+
+    supabase.auth.onAuthStateChange.listen((data) {
+      if (mounted) {
+        setState(() {
+          _session = data.session;
+          _isLoading = false;
+        });
+      }
+    });
+  }
+
+  Future<void> _initSession() async {
+    await Future.delayed(Duration.zero);
+    if (mounted) {
+      setState(() {
+        _session = supabase.auth.currentSession;
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    if (_session != null) {
+      return const AppShell();
+    }
+    return const AuthPage();
   }
 }
 

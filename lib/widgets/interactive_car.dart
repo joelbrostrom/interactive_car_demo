@@ -75,80 +75,80 @@ class InteractiveCar extends StatelessWidget {
                 ),
                 // Hood zone (top)
                 _buildTappableZone(
-                  left: carWidth * 0.15,
-                  top: carHeight * 0.02,
-                  width: carWidth * 0.7,
-                  height: carHeight * 0.15,
+                  left: carWidth * 0.20,
+                  top: carHeight * 0.04,
+                  width: carWidth * 0.60,
+                  height: carHeight * 0.05,
                   part: CarPart.hood,
                   isActive: status.hood,
                   label: 'Hood',
                 ),
-                // Lights zone
+                // Lights zone (headlights)
                 _buildTappableZone(
-                  left: carWidth * 0.15,
-                  top: carHeight * 0.17,
-                  width: carWidth * 0.7,
-                  height: carHeight * 0.06,
+                  left: carWidth * 0.20,
+                  top: carHeight * 0.09,
+                  width: carWidth * 0.60,
+                  height: carHeight * 0.030,
                   part: CarPart.lights,
                   isActive: status.lights,
                   label: 'Lights',
                 ),
                 // Wipers zone (windshield area)
                 _buildTappableZone(
-                  left: carWidth * 0.2,
-                  top: carHeight * 0.23,
-                  width: carWidth * 0.6,
-                  height: carHeight * 0.08,
+                  left: carWidth * 0.24,
+                  top: carHeight * 0.12,
+                  width: carWidth * 0.52,
+                  height: carHeight * 0.06,
                   part: CarPart.wipers,
                   isActive: status.wipers,
                   label: 'Wipers',
                 ),
-                // Front left door (aligned with front wheels at 0.28)
+                // Front left door (aligned with front wheel at 0.28)
                 _buildTappableZone(
-                  left: carWidth * 0.02,
-                  top: carHeight * 0.22,
+                  left: carWidth * 0.01,
+                  top: carHeight * 0.18,
                   width: carWidth * 0.13,
-                  height: carHeight * 0.15,
+                  height: carHeight * 0.10,
                   part: CarPart.frontLeftDoor,
                   isActive: status.frontLeftDoor,
                   label: 'FL',
                 ),
                 // Front right door
                 _buildTappableZone(
-                  left: carWidth * 0.85,
-                  top: carHeight * 0.22,
+                  left: carWidth * 0.86,
+                  top: carHeight * 0.18,
                   width: carWidth * 0.13,
-                  height: carHeight * 0.15,
+                  height: carHeight * 0.10,
                   part: CarPart.frontRightDoor,
                   isActive: status.frontRightDoor,
                   label: 'FR',
                 ),
-                // Rear left door (aligned with rear wheels at 0.72)
+                // Rear left door (next to rear wheel)
                 _buildTappableZone(
-                  left: carWidth * 0.02,
-                  top: carHeight * 0.38,
+                  left: carWidth * 0.01,
+                  top: carHeight * 0.28,
                   width: carWidth * 0.13,
-                  height: carHeight * 0.15,
+                  height: carHeight * 0.10,
                   part: CarPart.rearLeftDoor,
                   isActive: status.rearLeftDoor,
                   label: 'RL',
                 ),
                 // Rear right door
                 _buildTappableZone(
-                  left: carWidth * 0.85,
-                  top: carHeight * 0.38,
+                  left: carWidth * 0.86,
+                  top: carHeight * 0.28,
                   width: carWidth * 0.13,
-                  height: carHeight * 0.15,
+                  height: carHeight * 0.10,
                   part: CarPart.rearRightDoor,
                   isActive: status.rearRightDoor,
                   label: 'RR',
                 ),
                 // Trunk zone (bottom)
                 _buildTappableZone(
-                  left: carWidth * 0.15,
-                  top: carHeight * 0.82,
-                  width: carWidth * 0.7,
-                  height: carHeight * 0.15,
+                  left: carWidth * 0.22,
+                  top: carHeight * 0.40,
+                  width: carWidth * 0.56,
+                  height: carHeight * 0.12,
                   part: CarPart.trunk,
                   isActive: status.trunk,
                   label: 'Trunk',
@@ -397,16 +397,16 @@ class CarPainter extends CustomPainter {
 
     // Door indicators when open
     if (status.frontLeftDoor) {
-      _drawOpenDoor(canvas, Offset(w * 0.05, h * 0.25), -0.3, w * 0.15);
+      _drawOpenDoor(canvas, Offset(w * 0.00, h * 0.35), -0.3, w * 0.15);
     }
     if (status.frontRightDoor) {
-      _drawOpenDoor(canvas, Offset(w * 0.95, h * 0.25), 0.3, w * 0.15);
+      _drawOpenDoor(canvas, Offset(w * 0.85, h * 0.32), 0.3, w * 0.15);
     }
     if (status.rearLeftDoor) {
-      _drawOpenDoor(canvas, Offset(w * 0.05, h * 0.42), -0.3, w * 0.15);
+      _drawOpenDoor(canvas, Offset(w * 0.00, h * 0.60), -0.3, w * 0.15);
     }
     if (status.rearRightDoor) {
-      _drawOpenDoor(canvas, Offset(w * 0.95, h * 0.42), 0.3, w * 0.15);
+      _drawOpenDoor(canvas, Offset(w * 0.85, h * 0.58), 0.3, w * 0.15);
     }
     if (status.hood) {
       _drawOpenHood(canvas, w, h);
