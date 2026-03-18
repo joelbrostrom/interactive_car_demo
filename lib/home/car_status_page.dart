@@ -27,45 +27,58 @@ class _CarStatusPageState extends State<CarStatusPage> {
       final userId = supabase.auth.currentUser?.id;
       if (userId == null) return;
 
-      final carData = await supabase
-          .from('cars')
-          .select('id')
-          .eq('user_id', userId)
-          .maybeSingle();
+      final carData =
+          await supabase
+              .from('cars')
+              .select('id')
+              .eq('user_id', userId)
+              .maybeSingle();
 
       if (carData == null) {
-        final newCar = await supabase.from('cars').insert({
-          'user_id': userId,
-          'model': 'Camry',
-          'year': 2024,
-          'distance_km': 15420,
-          'color': 'Silver',
-        }).select().single();
+        final newCar =
+            await supabase
+                .from('cars')
+                .insert({
+                  'user_id': userId,
+                  'model': 'Camry',
+                  'year': 2024,
+                  'distance_km': 15420,
+                  'color': 'Silver',
+                })
+                .select()
+                .single();
 
         _carId = newCar['id'];
 
-        final newStatus = await supabase.from('car_status').insert({
-          'car_id': _carId,
-        }).select().single();
+        final newStatus =
+            await supabase
+                .from('car_status')
+                .insert({'car_id': _carId})
+                .select()
+                .single();
 
         _statusId = newStatus['id'];
         _status = CarStatus.fromJson(newStatus);
       } else {
         _carId = carData['id'];
 
-        final statusData = await supabase
-            .from('car_status')
-            .select()
-            .eq('car_id', _carId!)
-            .maybeSingle();
+        final statusData =
+            await supabase
+                .from('car_status')
+                .select()
+                .eq('car_id', _carId!)
+                .maybeSingle();
 
         if (statusData != null) {
           _statusId = statusData['id'];
           _status = CarStatus.fromJson(statusData);
         } else {
-          final newStatus = await supabase.from('car_status').insert({
-            'car_id': _carId,
-          }).select().single();
+          final newStatus =
+              await supabase
+                  .from('car_status')
+                  .insert({'car_id': _carId})
+                  .select()
+                  .single();
 
           _statusId = newStatus['id'];
           _status = CarStatus.fromJson(newStatus);
@@ -175,7 +188,11 @@ class _CarStatusPageState extends State<CarStatusPage> {
     return part == CarPart.lights || part == CarPart.wipers;
   }
 
-  Widget _buildPartActionSheet(String partName, bool currentValue, CarPart part) {
+  Widget _buildPartActionSheet(
+    String partName,
+    bool currentValue,
+    CarPart part,
+  ) {
     final isToggle = _isTogglePart(part);
     final actionOn = isToggle ? 'Turn On' : 'Open';
     final actionOff = isToggle ? 'Turn Off' : 'Close';
@@ -183,67 +200,214 @@ class _CarStatusPageState extends State<CarStatusPage> {
     final stateOff = isToggle ? 'Off' : 'Closed';
 
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(28),
+      decoration: BoxDecoration(
+        color: const Color(0xFF161B22),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        border: Border.all(color: const Color(0xFF30363D), width: 1),
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              Icon(
-                _getPartIcon(part),
-                size: 32,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(width: 16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    partName,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  Text(
-                    'Current status: ${currentValue ? stateOn : stateOff}',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: currentValue ? Colors.amber.shade700 : Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+          Container(
+            width: 40,
+            height: 4,
+            margin: const EdgeInsets.only(bottom: 24),
+            decoration: BoxDecoration(
+              color: const Color(0xFF30363D),
+              borderRadius: BorderRadius.circular(2),
+            ),
           ),
-          const SizedBox(height: 24),
           Row(
             children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: currentValue
-                      ? null
-                      : () {
-                          _updatePartStatus(part, true);
-                          Navigator.pop(context);
-                        },
-                  icon: Icon(isToggle ? Icons.power : Icons.lock_open),
-                  label: Text(actionOn),
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFF00E5FF).withValues(alpha: 0.2),
+                      const Color(0xFF7C4DFF).withValues(alpha: 0.2),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: const Color(0xFF00E5FF).withValues(alpha: 0.3),
+                  ),
+                ),
+                child: Icon(
+                  _getPartIcon(part),
+                  size: 28,
+                  color: const Color(0xFF00E5FF),
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: !currentValue
-                      ? null
-                      : () {
-                          _updatePartStatus(part, false);
-                          Navigator.pop(context);
-                        },
-                  icon: Icon(isToggle ? Icons.power_off : Icons.lock),
-                  label: Text(actionOff),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      partName,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFFF0F6FC),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color:
+                                currentValue
+                                    ? const Color(0xFFFFAB00)
+                                    : const Color(0xFF8B949E),
+                            boxShadow:
+                                currentValue
+                                    ? [
+                                      BoxShadow(
+                                        color: const Color(
+                                          0xFFFFAB00,
+                                        ).withValues(alpha: 0.5),
+                                        blurRadius: 8,
+                                      ),
+                                    ]
+                                    : null,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          currentValue ? stateOn : stateOff,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color:
+                                currentValue
+                                    ? const Color(0xFFFFAB00)
+                                    : const Color(0xFF8B949E),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 28),
+          Row(
+            children: [
+              Expanded(
+                child: _buildActionButton(
+                  label: actionOn,
+                  icon:
+                      isToggle
+                          ? Icons.power_settings_new
+                          : Icons.lock_open_rounded,
+                  isEnabled: !currentValue,
+                  isPrimary: true,
+                  onPressed: () {
+                    _updatePartStatus(part, true);
+                    Navigator.pop(context);
+                  },
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildActionButton(
+                  label: actionOff,
+                  icon: isToggle ? Icons.power_off_rounded : Icons.lock_rounded,
+                  isEnabled: currentValue,
+                  isPrimary: false,
+                  onPressed: () {
+                    _updatePartStatus(part, false);
+                    Navigator.pop(context);
+                  },
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
         ],
+      ),
+    );
+  }
+
+  Widget _buildActionButton({
+    required String label,
+    required IconData icon,
+    required bool isEnabled,
+    required bool isPrimary,
+    required VoidCallback onPressed,
+  }) {
+    return Container(
+      height: 52,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        gradient:
+            isEnabled && isPrimary
+                ? const LinearGradient(
+                  colors: [Color(0xFF00E5FF), Color(0xFF00B8D4)],
+                )
+                : null,
+        color: isEnabled && !isPrimary ? const Color(0xFF21262D) : null,
+        border:
+            !isEnabled
+                ? Border.all(color: const Color(0xFF30363D))
+                : isPrimary
+                ? null
+                : Border.all(
+                  color: const Color(0xFF00E5FF).withValues(alpha: 0.5),
+                ),
+        boxShadow:
+            isEnabled && isPrimary
+                ? [
+                  BoxShadow(
+                    color: const Color(0xFF00E5FF).withValues(alpha: 0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+                : null,
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: isEnabled ? onPressed : null,
+          borderRadius: BorderRadius.circular(12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 20,
+                color:
+                    isEnabled
+                        ? isPrimary
+                            ? const Color(0xFF003544)
+                            : const Color(0xFF00E5FF)
+                        : const Color(0xFF30363D),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color:
+                      isEnabled
+                          ? isPrimary
+                              ? const Color(0xFF003544)
+                              : const Color(0xFF00E5FF)
+                          : const Color(0xFF30363D),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -270,15 +434,18 @@ class _CarStatusPageState extends State<CarStatusPage> {
     if (_statusId == null) return;
 
     try {
-      await supabase.from('car_status').update({
-        _getPartColumnName(part): value,
-        'updated_at': DateTime.now().toIso8601String(),
-      }).eq('id', _statusId!);
+      await supabase
+          .from('car_status')
+          .update({
+            _getPartColumnName(part): value,
+            'updated_at': DateTime.now().toIso8601String(),
+          })
+          .eq('id', _statusId!);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error updating status: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error updating status: $e')));
       }
     }
   }
@@ -287,96 +454,235 @@ class _CarStatusPageState extends State<CarStatusPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Car Status'),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: const Color(0xFF00E5FF).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.dashboard_rounded,
+                size: 20,
+                color: Color(0xFF00E5FF),
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Text('Vehicle Control'),
+          ],
+        ),
         centerTitle: true,
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      children: [
-                        Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
+      body:
+          _isLoading
+              ? Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const SizedBox(
+                      width: 48,
+                      height: 48,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 3,
+                        color: Color(0xFF00E5FF),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Connecting to vehicle...',
+                      style: TextStyle(
+                        color: const Color(0xFF8B949E),
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+              : Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(20),
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  const Color(0xFF21262D),
+                                  const Color(
+                                    0xFF21262D,
+                                  ).withValues(alpha: 0.8),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: const Color(0xFF30363D),
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
                               children: [
-                                Text(
-                                  'Tap any part to control',
-                                  style: Theme.of(context).textTheme.titleMedium,
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: const Color(
+                                      0xFF00E5FF,
+                                    ).withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: const Icon(
+                                    Icons.touch_app_rounded,
+                                    color: Color(0xFF00E5FF),
+                                    size: 22,
+                                  ),
                                 ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'Highlighted areas indicate open/on status',
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: Colors.grey,
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'Interactive Control',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xFFF0F6FC),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        'Tap any highlighted zone to control',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: const Color(0xFF8B949E),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(
+                                      0xFF238636,
+                                    ).withValues(alpha: 0.2),
+                                    borderRadius: BorderRadius.circular(20),
+                                    border: Border.all(
+                                      color: const Color(
+                                        0xFF238636,
+                                      ).withValues(alpha: 0.4),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        width: 6,
+                                        height: 6,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: const Color(0xFF3FB950),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: const Color(
+                                                0xFF3FB950,
+                                              ).withValues(alpha: 0.5),
+                                              blurRadius: 4,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      const Text(
+                                        'Live',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xFF3FB950),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 16),
-                        SizedBox(
-                          height: 600,
-                          child: InteractiveCar(
-                            status: _status,
-                            onPartTapped: _onPartTapped,
+                          const SizedBox(height: 20),
+                          SizedBox(
+                            height: 600,
+                            child: InteractiveCar(
+                              status: _status,
+                              onPartTapped: _onPartTapped,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                _buildStatusBar(),
-              ],
-            ),
+                  _buildStatusBar(),
+                ],
+              ),
     );
   }
 
   Widget _buildStatusBar() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-        border: Border(
-          top: BorderSide(
-            color: Theme.of(context).dividerColor,
-          ),
+        color: const Color(0xFF161B22),
+        border: const Border(
+          top: BorderSide(color: Color(0xFF30363D), width: 1),
         ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildStatusItem(
-            Icons.door_sliding,
-            'Doors',
-            _countOpenDoors(),
-          ),
-          _buildStatusItem(
-            Icons.lightbulb,
-            'Lights',
-            _status.lights ? 'On' : 'Off',
-          ),
-          _buildStatusItem(
-            Icons.water_drop,
-            'Wipers',
-            _status.wipers ? 'On' : 'Off',
-          ),
-          _buildStatusItem(
-            Icons.inventory_2,
-            'Trunk',
-            _status.trunk ? 'Open' : 'Closed',
-          ),
-          _buildStatusItem(
-            Icons.construction,
-            'Hood',
-            _status.hood ? 'Open' : 'Closed',
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
           ),
         ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildStatusItem(
+              Icons.sensor_door_rounded,
+              'Doors',
+              _countOpenDoors(),
+            ),
+            _buildStatusItem(
+              Icons.lightbulb_rounded,
+              'Lights',
+              _status.lights ? 'On' : 'Off',
+            ),
+            _buildStatusItem(
+              Icons.water_drop_rounded,
+              'Wipers',
+              _status.wipers ? 'On' : 'Off',
+            ),
+            _buildStatusItem(
+              Icons.inventory_2_rounded,
+              'Trunk',
+              _status.trunk ? 'Open' : 'Closed',
+            ),
+            _buildStatusItem(
+              Icons.handyman_rounded,
+              'Hood',
+              _status.hood ? 'Open' : 'Closed',
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -391,29 +697,56 @@ class _CarStatusPageState extends State<CarStatusPage> {
   }
 
   Widget _buildStatusItem(IconData icon, String label, String value) {
-    final isActive = value.contains('On') || value.contains('Open') || 
-                     (value.contains('/') && !value.startsWith('0'));
-    
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          icon,
-          color: isActive ? Colors.amber.shade700 : Colors.grey,
+    final isActive =
+        value.contains('On') ||
+        value.contains('Open') ||
+        (value.contains('/') && !value.startsWith('0'));
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color:
+            isActive
+                ? const Color(0xFFFFAB00).withValues(alpha: 0.1)
+                : const Color(0xFF21262D),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color:
+              isActive
+                  ? const Color(0xFFFFAB00).withValues(alpha: 0.3)
+                  : const Color(0xFF30363D),
+          width: 1,
         ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-        Text(
-          value,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            fontWeight: FontWeight.bold,
-            color: isActive ? Colors.amber.shade700 : null,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 22,
+            color: isActive ? const Color(0xFFFFAB00) : const Color(0xFF8B949E),
           ),
-        ),
-      ],
+          const SizedBox(height: 6),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              color:
+                  isActive ? const Color(0xFFF0F6FC) : const Color(0xFF8B949E),
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color:
+                  isActive ? const Color(0xFFFFAB00) : const Color(0xFF8B949E),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

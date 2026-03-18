@@ -177,26 +177,54 @@ class InteractiveCar extends StatelessWidget {
       height: height,
       child: GestureDetector(
         onTap: () => onPartTapped(part),
-        child: Container(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
           decoration: BoxDecoration(
+            gradient:
+                isActive
+                    ? LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        const Color(0xFFFFAB00).withValues(alpha: 0.4),
+                        const Color(0xFFFF6D00).withValues(alpha: 0.3),
+                      ],
+                    )
+                    : null,
             color:
                 isActive
-                    ? Colors.amber.withValues(alpha: 0.4)
-                    : Colors.transparent,
+                    ? null
+                    : const Color(0xFF00E5FF).withValues(alpha: 0.05),
             border: Border.all(
               color:
-                  isActive ? Colors.amber : Colors.grey.withValues(alpha: 0.3),
-              width: 2,
+                  isActive
+                      ? const Color(0xFFFFAB00)
+                      : const Color(0xFF00E5FF).withValues(alpha: 0.3),
+              width: isActive ? 2 : 1,
             ),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(10),
+            boxShadow:
+                isActive
+                    ? [
+                      BoxShadow(
+                        color: const Color(0xFFFFAB00).withValues(alpha: 0.4),
+                        blurRadius: 12,
+                        spreadRadius: 0,
+                      ),
+                    ]
+                    : null,
           ),
           child: Center(
             child: Text(
               label,
               style: TextStyle(
-                color: isActive ? Colors.amber.shade900 : Colors.grey,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
+                color:
+                    isActive
+                        ? const Color(0xFFFFAB00)
+                        : const Color(0xFF00E5FF).withValues(alpha: 0.7),
+                fontWeight: FontWeight.w700,
+                fontSize: 11,
+                letterSpacing: 0.5,
               ),
             ),
           ),
@@ -215,33 +243,33 @@ class CarPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final bodyPaint =
         Paint()
-          ..color = const Color(0xFFC0C0C0)
+          ..color = const Color(0xFF2D3748)
           ..style = PaintingStyle.fill;
 
     final outlinePaint =
         Paint()
-          ..color = const Color(0xFF404040)
+          ..color = const Color(0xFF00E5FF).withAlpha(100)
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 3;
+          ..strokeWidth = 2;
 
     final windowPaint =
         Paint()
-          ..color = const Color(0xFF87CEEB)
+          ..color = const Color(0xFF1A365D)
           ..style = PaintingStyle.fill;
 
     final wheelPaint =
         Paint()
-          ..color = const Color(0xFF2D2D2D)
+          ..color = const Color(0xFF1A1A2E)
           ..style = PaintingStyle.fill;
 
     final lightOnPaint =
         Paint()
-          ..color = Colors.amber
+          ..color = const Color(0xFFFFAB00)
           ..style = PaintingStyle.fill;
 
     final lightOffPaint =
         Paint()
-          ..color = const Color(0xFFE0E0E0)
+          ..color = const Color(0xFF4A5568)
           ..style = PaintingStyle.fill;
 
     final w = size.width;
@@ -268,7 +296,7 @@ class CarPainter extends CustomPainter {
     hoodPath.lineTo(w * 0.2, h * 0.18);
     hoodPath.close();
 
-    canvas.drawPath(hoodPath, Paint()..color = const Color(0xFFB0B0B0));
+    canvas.drawPath(hoodPath, Paint()..color = const Color(0xFF3D4A5C));
     canvas.drawPath(hoodPath, outlinePaint..strokeWidth = 1);
 
     // Windshield
@@ -307,7 +335,7 @@ class CarPainter extends CustomPainter {
         const Radius.circular(8),
       ),
     );
-    canvas.drawPath(roofPath, Paint()..color = const Color(0xFF909090));
+    canvas.drawPath(roofPath, Paint()..color = const Color(0xFF252D3A));
 
     // Rear window
     final rearWindowPath = Path();
@@ -323,7 +351,7 @@ class CarPainter extends CustomPainter {
     trunkPath.moveTo(w * 0.2, h * 0.82);
     trunkPath.lineTo(w * 0.8, h * 0.82);
     trunkPath.quadraticBezierTo(w * 0.5, h * 0.95, w * 0.2, h * 0.82);
-    canvas.drawPath(trunkPath, Paint()..color = const Color(0xFFB0B0B0));
+    canvas.drawPath(trunkPath, Paint()..color = const Color(0xFF3D4A5C));
 
     // Headlights
     canvas.drawOval(
@@ -419,19 +447,24 @@ class CarPainter extends CustomPainter {
   void _drawOpenDoor(Canvas canvas, Offset pivot, double angle, double length) {
     final doorPaint =
         Paint()
-          ..color = const Color(0xFFC0C0C0)
+          ..color = const Color(0xFF2D3748)
           ..style = PaintingStyle.fill;
     final doorOutline =
         Paint()
-          ..color = Colors.amber
+          ..color = const Color(0xFFFFAB00)
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 3;
+          ..strokeWidth = 2;
+    final doorGlow =
+        Paint()
+          ..color = const Color(0xFFFFAB00).withAlpha(50)
+          ..style = PaintingStyle.fill;
 
     canvas.save();
     canvas.translate(pivot.dx, pivot.dy);
     canvas.rotate(angle);
 
     final doorRect = Rect.fromLTWH(0, 0, length, length * 0.8);
+    canvas.drawRect(doorRect.inflate(3), doorGlow);
     canvas.drawRect(doorRect, doorPaint);
     canvas.drawRect(doorRect, doorOutline);
 
@@ -441,8 +474,13 @@ class CarPainter extends CustomPainter {
   void _drawOpenHood(Canvas canvas, double w, double h) {
     final hoodPaint =
         Paint()
-          ..color = Colors.amber.withValues(alpha: 0.3)
+          ..color = const Color(0xFFFFAB00).withAlpha(80)
           ..style = PaintingStyle.fill;
+    final hoodOutline =
+        Paint()
+          ..color = const Color(0xFFFFAB00)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1;
 
     final path = Path();
     path.moveTo(w * 0.2, h * 0.02);
@@ -451,13 +489,19 @@ class CarPainter extends CustomPainter {
     path.close();
 
     canvas.drawPath(path, hoodPaint);
+    canvas.drawPath(path, hoodOutline);
   }
 
   void _drawOpenTrunk(Canvas canvas, double w, double h) {
     final trunkPaint =
         Paint()
-          ..color = Colors.amber.withValues(alpha: 0.3)
+          ..color = const Color(0xFFFFAB00).withAlpha(80)
           ..style = PaintingStyle.fill;
+    final trunkOutline =
+        Paint()
+          ..color = const Color(0xFFFFAB00)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1;
 
     final path = Path();
     path.moveTo(w * 0.2, h * 0.95);
@@ -466,6 +510,7 @@ class CarPainter extends CustomPainter {
     path.close();
 
     canvas.drawPath(path, trunkPaint);
+    canvas.drawPath(path, trunkOutline);
   }
 
   @override

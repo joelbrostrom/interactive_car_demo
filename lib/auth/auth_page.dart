@@ -95,115 +95,226 @@ class _AuthPageState extends State<AuthPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Theme.of(context).colorScheme.primary,
-              Theme.of(context).colorScheme.primaryContainer,
-            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF0D1117), Color(0xFF161B22), Color(0xFF0D1117)],
+            stops: [0.0, 0.5, 1.0],
           ),
         ),
-        child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
-              child: Card(
-                elevation: 8,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+        child: Stack(
+          children: [
+            Positioned(
+              top: -100,
+              right: -100,
+              child: Container(
+                width: 300,
+                height: 300,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      const Color(0xFF00E5FF).withValues(alpha: 0.15),
+                      Colors.transparent,
+                    ],
+                  ),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(32),
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 400),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Image.network(
-                          'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Toyota_carance_badge.svg/200px-Toyota_cariance_badge.svg.png',
-                          height: 80,
-                          errorBuilder:
-                              (_, _, _) => Icon(
-                                Icons.directions_car,
-                                size: 80,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Toyota',
-                          style: Theme.of(
-                            context,
-                          ).textTheme.headlineMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          _isSignUp ? 'Create Account' : 'Welcome Back',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        const SizedBox(height: 32),
-                        TextField(
-                          controller: _emailController,
-                          decoration: const InputDecoration(
-                            labelText: 'Email',
-                            prefixIcon: Icon(Icons.email_outlined),
-                            border: OutlineInputBorder(),
-                          ),
-                          keyboardType: TextInputType.emailAddress,
-                        ),
-                        const SizedBox(height: 16),
-                        TextField(
-                          controller: _passwordController,
-                          decoration: const InputDecoration(
-                            labelText: 'Password',
-                            prefixIcon: Icon(Icons.lock_outlined),
-                            border: OutlineInputBorder(),
-                          ),
-                          obscureText: true,
-                          onSubmitted: (_) => _handleAuth(),
-                        ),
-                        const SizedBox(height: 24),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 48,
-                          child: FilledButton(
-                            onPressed: _isLoading ? null : _handleAuth,
-                            child:
-                                _isLoading
-                                    ? const SizedBox(
-                                      height: 20,
-                                      width: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                    : Text(_isSignUp ? 'Sign Up' : 'Sign In'),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        TextButton(
-                          onPressed: () {
-                            setState(() => _isSignUp = !_isSignUp);
-                          },
-                          child: Text(
-                            _isSignUp
-                                ? 'Already have an account? Sign In'
-                                : "Don't have an account? Sign Up",
-                          ),
+              ),
+            ),
+            Positioned(
+              bottom: -150,
+              left: -100,
+              child: Container(
+                width: 400,
+                height: 400,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      const Color(0xFF7C4DFF).withValues(alpha: 0.1),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SafeArea(
+              child: Center(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: Container(
+                    constraints: const BoxConstraints(maxWidth: 420),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF21262D).withValues(alpha: 0.8),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: const Color(0xFF30363D),
+                        width: 1,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(
+                            0xFF00E5FF,
+                          ).withValues(alpha: 0.05),
+                          blurRadius: 40,
+                          spreadRadius: 0,
                         ),
                       ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(40),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  const Color(
+                                    0xFF00E5FF,
+                                  ).withValues(alpha: 0.2),
+                                  const Color(
+                                    0xFF7C4DFF,
+                                  ).withValues(alpha: 0.2),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: const Color(
+                                  0xFF00E5FF,
+                                ).withValues(alpha: 0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: const Icon(
+                              Icons.directions_car,
+                              size: 48,
+                              color: Color(0xFF00E5FF),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          ShaderMask(
+                            shaderCallback:
+                                (bounds) => const LinearGradient(
+                                  colors: [
+                                    Color(0xFF00E5FF),
+                                    Color(0xFF7C4DFF),
+                                  ],
+                                ).createShader(bounds),
+                            child: const Text(
+                              'TOYOTA',
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 6,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            _isSignUp ? 'Create Account' : 'Welcome Back',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Color(0xFF8B949E),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 40),
+                          TextField(
+                            controller: _emailController,
+                            decoration: const InputDecoration(
+                              labelText: 'Email',
+                              prefixIcon: Icon(Icons.email_outlined),
+                            ),
+                            keyboardType: TextInputType.emailAddress,
+                            style: const TextStyle(color: Color(0xFFF0F6FC)),
+                          ),
+                          const SizedBox(height: 20),
+                          TextField(
+                            controller: _passwordController,
+                            decoration: const InputDecoration(
+                              labelText: 'Password',
+                              prefixIcon: Icon(Icons.lock_outlined),
+                            ),
+                            obscureText: true,
+                            onSubmitted: (_) => _handleAuth(),
+                            style: const TextStyle(color: Color(0xFFF0F6FC)),
+                          ),
+                          const SizedBox(height: 32),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 52,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFF00E5FF),
+                                    Color(0xFF00B8D4),
+                                  ],
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(
+                                      0xFF00E5FF,
+                                    ).withValues(alpha: 0.3),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: FilledButton(
+                                onPressed: _isLoading ? null : _handleAuth,
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: Colors.transparent,
+                                  shadowColor: Colors.transparent,
+                                ),
+                                child:
+                                    _isLoading
+                                        ? const SizedBox(
+                                          height: 20,
+                                          width: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                        : Text(
+                                          _isSignUp ? 'Sign Up' : 'Sign In',
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xFF003544),
+                                          ),
+                                        ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          TextButton(
+                            onPressed: () {
+                              setState(() => _isSignUp = !_isSignUp);
+                            },
+                            child: Text(
+                              _isSignUp
+                                  ? 'Already have an account? Sign In'
+                                  : "Don't have an account? Sign Up",
+                              style: const TextStyle(color: Color(0xFF00E5FF)),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );

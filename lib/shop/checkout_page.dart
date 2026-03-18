@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../supabase_config.dart';
 
 class CheckoutPage extends StatefulWidget {
@@ -79,9 +80,31 @@ class _CheckoutPageState extends State<CheckoutPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Checkout')),
+      backgroundColor: const Color(0xFF0D1117),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF161B22),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: const Color(0xFF00E5FF).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.payment_rounded,
+                size: 20,
+                color: Color(0xFF00E5FF),
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Text('Checkout'),
+          ],
+        ),
+      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -90,32 +113,59 @@ class _CheckoutPageState extends State<CheckoutPage> {
             _buildShippingInfo(),
             const SizedBox(height: 16),
             _buildPaymentInfo(),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
             _buildTotalSection(),
             const SizedBox(height: 24),
-            FilledButton(
-              onPressed: _isProcessing ? null : _placeOrder,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                child:
-                    _isProcessing
-                        ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                        : const Text('Place Order'),
+            Container(
+              height: 56,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF00E5FF), Color(0xFF00B8D4)],
+                ),
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF00E5FF).withValues(alpha: 0.3),
+                    blurRadius: 16,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: _isProcessing ? null : _placeOrder,
+                  borderRadius: BorderRadius.circular(14),
+                  child: Center(
+                    child:
+                        _isProcessing
+                            ? const SizedBox(
+                              height: 22,
+                              width: 22,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                color: Color(0xFF003544),
+                              ),
+                            )
+                            : const Text(
+                                'Place Order',
+                                style: TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF003544),
+                                ),
+                              ),
+                  ),
+                ),
               ),
             ),
-            const SizedBox(height: 16),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'This is a demo app. No real payment will be processed.',
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: Colors.grey),
+              style: TextStyle(
+                fontSize: 12,
+                color: Color(0xFF8B949E),
+              ),
               textAlign: TextAlign.center,
             ),
           ],
@@ -125,175 +175,295 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   Widget _buildOrderSummary() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.receipt_long),
-                const SizedBox(width: 8),
-                Text(
-                  'Order Summary',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: const Color(0xFF21262D),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF30363D)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF7C4DFF).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-              ],
-            ),
-            const Divider(height: 24),
-            ...widget.cartItems.map((item) {
-              final shopItem = item['shop_items'] as Map<String, dynamic>?;
-              final name = shopItem?['name'] ?? 'Unknown';
-              final price = (shopItem?['price'] as num?)?.toDouble() ?? 0.0;
-              final quantity = (item['quantity'] as int?) ?? 1;
+                child: const Icon(
+                  Icons.receipt_long_rounded,
+                  color: Color(0xFF7C4DFF),
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                'Order Summary',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFFF0F6FC),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Container(height: 1, color: const Color(0xFF30363D)),
+          const SizedBox(height: 12),
+          ...widget.cartItems.map((item) {
+            final shopItem = item['shop_items'] as Map<String, dynamic>?;
+            final name = shopItem?['name'] ?? 'Unknown';
+            final price = (shopItem?['price'] as num?)?.toDouble() ?? 0.0;
+            final quantity = (item['quantity'] as int?) ?? 1;
 
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Row(
-                  children: [
-                    Expanded(child: Text('$name x$quantity')),
-                    Text(
-                      '\$${(price * quantity).toStringAsFixed(2)}',
-                      style: const TextStyle(fontWeight: FontWeight.w500),
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      '$name x$quantity',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF8B949E),
+                      ),
                     ),
-                  ],
-                ),
-              );
-            }),
-          ],
-        ),
+                  ),
+                  Text(
+                    '\$${(price * quantity).toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFFF0F6FC),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
       ),
     );
   }
 
   Widget _buildShippingInfo() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.local_shipping),
-                const SizedBox(width: 8),
-                Text(
-                  'Shipping Information',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            const Divider(height: 24),
-            _buildInfoRow('Name', 'John Doe'),
-            _buildInfoRow('Address', '123 Toyota Lane'),
-            _buildInfoRow('City', 'Tokyo, Japan 100-0001'),
-            _buildInfoRow('Phone', '+81 3-1234-5678'),
-            const SizedBox(height: 8),
-            TextButton.icon(
-              onPressed: () {},
-              icon: const Icon(Icons.edit, size: 16),
-              label: const Text('Edit Address'),
-            ),
-          ],
-        ),
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: const Color(0xFF21262D),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF30363D)),
       ),
-    );
-  }
-
-  Widget _buildPaymentInfo() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.credit_card),
-                const SizedBox(width: 8),
-                Text(
-                  'Payment Method',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF00E5FF).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-              ],
+                child: const Icon(
+                  Icons.local_shipping_rounded,
+                  color: Color(0xFF00E5FF),
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                'Shipping Information',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFFF0F6FC),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Container(height: 1, color: const Color(0xFF30363D)),
+          const SizedBox(height: 12),
+          _buildInfoRow('Name', 'John Doe'),
+          _buildInfoRow('Address', '123 Toyota Lane'),
+          _buildInfoRow('City', 'Tokyo, Japan 100-0001'),
+          _buildInfoRow('Phone', '+81 3-1234-5678'),
+          const SizedBox(height: 12),
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: const Color(0xFF00E5FF).withValues(alpha: 0.4),
+              ),
             ),
-            const Divider(height: 24),
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.shade50,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(Icons.credit_card, color: Colors.blue.shade700),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {},
+                borderRadius: BorderRadius.circular(8),
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text(
-                        'Demo Credit Card',
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
+                      Icon(Icons.edit_rounded, size: 16, color: Color(0xFF00E5FF)),
+                      SizedBox(width: 6),
                       Text(
-                        '**** **** **** 4242',
+                        'Edit Address',
                         style: TextStyle(
-                          color: Colors.grey.shade600,
-                          fontSize: 12,
+                          color: Color(0xFF00E5FF),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPaymentInfo() {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: const Color(0xFF21262D),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF30363D)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFF4081).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(
+                  Icons.credit_card_rounded,
+                  color: Color(0xFFFF4081),
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                'Payment Method',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFFF0F6FC),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Container(height: 1, color: const Color(0xFF30363D)),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFF7C4DFF).withValues(alpha: 0.2),
+                      const Color(0xFFFF4081).withValues(alpha: 0.2),
+                    ],
                   ),
-                  decoration: BoxDecoration(
-                    color: Colors.green.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    'Unlimited',
-                    style: TextStyle(
-                      color: Colors.green.shade700,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.credit_card_rounded,
+                  color: Color(0xFF7C4DFF),
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 14),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Demo Credit Card',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFFF0F6FC),
+                        fontSize: 14,
+                      ),
                     ),
+                    SizedBox(height: 2),
+                    Text(
+                      '**** **** **** 4242',
+                      style: TextStyle(
+                        color: Color(0xFF8B949E),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF238636).withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: const Color(0xFF238636).withValues(alpha: 0.4),
                   ),
                 ),
-              ],
-            ),
-          ],
-        ),
+                child: const Text(
+                  'Unlimited',
+                  style: TextStyle(
+                    color: Color(0xFF3FB950),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildInfoRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
             width: 80,
-            child: Text(label, style: TextStyle(color: Colors.grey.shade600)),
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: Color(0xFF8B949E),
+                fontSize: 13,
+              ),
+            ),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(fontWeight: FontWeight.w500),
+              style: const TextStyle(
+                fontWeight: FontWeight.w500,
+                color: Color(0xFFF0F6FC),
+                fontSize: 14,
+              ),
             ),
           ),
         ],
@@ -302,96 +472,175 @@ class _CheckoutPageState extends State<CheckoutPage> {
   }
 
   Widget _buildTotalSection() {
-    return Card(
-      color: Theme.of(context).colorScheme.primaryContainer,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Subtotal'),
-                Text('\$${widget.total.toStringAsFixed(2)}'),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Shipping'),
-                Text('FREE', style: TextStyle(color: Colors.green.shade700)),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [const Text('Tax'), const Text('\$0.00')],
-            ),
-            const Divider(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Total',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  '\$${widget.total.toStringAsFixed(2)}',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-              ],
-            ),
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFF00E5FF).withValues(alpha: 0.1),
+            const Color(0xFF7C4DFF).withValues(alpha: 0.1),
           ],
         ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: const Color(0xFF00E5FF).withValues(alpha: 0.2),
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Subtotal',
+                style: TextStyle(color: Color(0xFF8B949E)),
+              ),
+              Text(
+                '\$${widget.total.toStringAsFixed(2)}',
+                style: const TextStyle(color: Color(0xFFF0F6FC)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Shipping',
+                style: TextStyle(color: Color(0xFF8B949E)),
+              ),
+              const Text(
+                'FREE',
+                style: TextStyle(
+                  color: Color(0xFF3FB950),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Tax', style: TextStyle(color: Color(0xFF8B949E))),
+              Text('\$0.00', style: TextStyle(color: Color(0xFFF0F6FC))),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Container(height: 1, color: const Color(0xFF30363D)),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Total',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFFF0F6FC),
+                ),
+              ),
+              ShaderMask(
+                shaderCallback: (bounds) => const LinearGradient(
+                  colors: [Color(0xFF00E5FF), Color(0xFF7C4DFF)],
+                ).createShader(bounds),
+                child: Text(
+                  '\$${widget.total.toStringAsFixed(2)}',
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildOrderConfirmation() {
     return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: Colors.green.shade100,
-                    shape: BoxShape.circle,
+      backgroundColor: const Color(0xFF0D1117),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment.topCenter,
+            radius: 1.5,
+            colors: [
+              const Color(0xFF3FB950).withValues(alpha: 0.1),
+              const Color(0xFF0D1117),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(28),
+                    decoration: BoxDecoration(
+                      gradient: RadialGradient(
+                        colors: [
+                          const Color(0xFF3FB950).withValues(alpha: 0.2),
+                          const Color(0xFF3FB950).withValues(alpha: 0.05),
+                        ],
+                      ),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: const Color(0xFF3FB950).withValues(alpha: 0.3),
+                        width: 2,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF3FB950).withValues(alpha: 0.2),
+                          blurRadius: 40,
+                          spreadRadius: 0,
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.check_rounded,
+                      size: 64,
+                      color: Color(0xFF3FB950),
+                    ),
                   ),
-                  child: Icon(
-                    Icons.check_circle,
-                    size: 80,
-                    color: Colors.green.shade600,
+                  const SizedBox(height: 36),
+                  ShaderMask(
+                    shaderCallback: (bounds) => const LinearGradient(
+                      colors: [Color(0xFF3FB950), Color(0xFF00E5FF)],
+                    ).createShader(bounds),
+                    child: const Text(
+                      'Order Placed!',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 32),
-                Text(
-                  'Order Placed!',
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Thank you for your purchase',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Color(0xFF8B949E),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Thank you for your purchase',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Colors.grey.shade600,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
+                  const SizedBox(height: 36),
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF21262D),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: const Color(0xFF30363D)),
+                    ),
                     child: Column(
                       children: [
                         _buildConfirmationRow(
@@ -410,29 +659,54 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       ],
                     ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'This is a demo order. No actual order has been placed.',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodySmall?.copyWith(color: Colors.grey),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 32),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    onPressed: () {
-                      Navigator.of(context).popUntil((route) => route.isFirst);
-                    },
-                    child: const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      child: Text('Continue Shopping'),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'This is a demo order. No actual order has been placed.',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF8B949E),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 36),
+                  Container(
+                    width: double.infinity,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF00E5FF), Color(0xFF00B8D4)],
+                      ),
+                      borderRadius: BorderRadius.circular(14),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF00E5FF).withValues(alpha: 0.3),
+                          blurRadius: 16,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.of(context).popUntil((route) => route.isFirst);
+                        },
+                        borderRadius: BorderRadius.circular(14),
+                        child: const Center(
+                          child: Text(
+                            'Continue Shopping',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF003544),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -442,12 +716,32 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   Widget _buildConfirmationRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(color: Colors.grey.shade600)),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Color(0xFF8B949E),
+              fontSize: 14,
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            decoration: BoxDecoration(
+              color: const Color(0xFF30363D),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                color: Color(0xFFF0F6FC),
+                fontSize: 14,
+              ),
+            ),
+          ),
         ],
       ),
     );

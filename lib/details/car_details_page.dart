@@ -24,11 +24,12 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
       final userId = supabase.auth.currentUser?.id;
       if (userId == null) return;
 
-      final data = await supabase
-          .from('cars')
-          .select()
-          .eq('user_id', userId)
-          .maybeSingle();
+      final data =
+          await supabase
+              .from('cars')
+              .select()
+              .eq('user_id', userId)
+              .maybeSingle();
 
       if (mounted) {
         setState(() {
@@ -48,12 +49,33 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Car Details'),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: const Color(0xFF7C4DFF).withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.analytics_rounded,
+                size: 20,
+                color: Color(0xFF7C4DFF),
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Text('Vehicle Details'),
+          ],
+        ),
         centerTitle: true,
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _carData == null
+      body:
+          _isLoading
+              ? const Center(
+                child: CircularProgressIndicator(color: Color(0xFF00E5FF)),
+              )
+              : _carData == null
               ? _buildNoCar()
               : _buildCarDetails(),
     );
@@ -61,29 +83,45 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
 
   Widget _buildNoCar() {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.directions_car_outlined,
-            size: 80,
-            color: Colors.grey.shade400,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'No car registered',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              color: Colors.grey,
+      child: Container(
+        padding: const EdgeInsets.all(40),
+        margin: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: const Color(0xFF21262D),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: const Color(0xFF30363D)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: const Color(0xFF8B949E).withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.directions_car_outlined,
+                size: 60,
+                color: Color(0xFF8B949E),
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Go to Home to initialize your car',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.grey,
+            const SizedBox(height: 24),
+            const Text(
+              'No vehicle registered',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFFF0F6FC),
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 8),
+            const Text(
+              'Go to Control to initialize your car',
+              style: TextStyle(fontSize: 14, color: Color(0xFF8B949E)),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -112,98 +150,175 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
   }
 
   Widget _buildCarImage(String model) {
-    return Card(
-      clipBehavior: Clip.antiAlias,
-      child: Container(
-        height: 200,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Theme.of(context).colorScheme.primaryContainer,
-              Theme.of(context).colorScheme.secondaryContainer,
-            ],
-          ),
+    return Container(
+      height: 220,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF1A365D), Color(0xFF0D1117)],
         ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.directions_car,
-                size: 80,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Toyota $model',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
-                  fontWeight: FontWeight.bold,
+        border: Border.all(color: const Color(0xFF30363D), width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF00E5FF).withValues(alpha: 0.1),
+            blurRadius: 30,
+            spreadRadius: 0,
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            top: -50,
+            right: -50,
+            child: Container(
+              width: 150,
+              height: 150,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    const Color(0xFF00E5FF).withValues(alpha: 0.15),
+                    Colors.transparent,
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
-        ),
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF00E5FF).withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: const Color(0xFF00E5FF).withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.directions_car,
+                    size: 56,
+                    color: Color(0xFF00E5FF),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ShaderMask(
+                  shaderCallback:
+                      (bounds) => const LinearGradient(
+                        colors: [Color(0xFF00E5FF), Color(0xFF7C4DFF)],
+                      ).createShader(bounds),
+                  child: Text(
+                    'Toyota $model',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildHeaderCard(String model, int year) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.primaryContainer,
-                    borderRadius: BorderRadius.circular(20),
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: const Color(0xFF21262D),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF30363D)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      const Color(0xFF00E5FF).withValues(alpha: 0.2),
+                      const Color(0xFF7C4DFF).withValues(alpha: 0.2),
+                    ],
                   ),
-                  child: Text(
-                    'TOYOTA',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                    ),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: const Color(0xFF00E5FF).withValues(alpha: 0.3),
                   ),
                 ),
-                const Spacer(),
-                Icon(
-                  Icons.verified,
-                  color: Colors.green.shade600,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  'Registered',
+                child: const Text(
+                  'TOYOTA',
                   style: TextStyle(
-                    color: Colors.green.shade600,
-                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF00E5FF),
+                    fontWeight: FontWeight.w700,
+                    fontSize: 11,
+                    letterSpacing: 1,
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Text(
-              model,
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.bold,
               ),
-            ),
-            Text(
-              '$year Model Year',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: Colors.grey.shade600,
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF238636).withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: const Color(0xFF238636).withValues(alpha: 0.4),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.verified_rounded,
+                      size: 16,
+                      color: Color(0xFF3FB950),
+                    ),
+                    const SizedBox(width: 4),
+                    const Text(
+                      'Registered',
+                      style: TextStyle(
+                        color: Color(0xFF3FB950),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
               ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            model,
+            style: const TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFFF0F6FC),
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '$year Model Year',
+            style: const TextStyle(fontSize: 16, color: Color(0xFF8B949E)),
+          ),
+        ],
       ),
     );
   }
@@ -243,84 +358,129 @@ class _CarDetailsPageState extends State<CarDetailsPage> {
     required String label,
     required String value,
   }) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Icon(
-              icon,
-              color: Theme.of(context).colorScheme.primary,
-              size: 28,
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF21262D),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF30363D)),
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: const Color(0xFF00E5FF).withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
             ),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: Colors.grey.shade600,
-              ),
+            child: Icon(icon, color: const Color(0xFF00E5FF), size: 24),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 12, color: Color(0xFF8B949E)),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFFF0F6FC),
             ),
-            const SizedBox(height: 4),
-            Text(
-              value,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildFeaturesCard() {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Features',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.bold,
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: const Color(0xFF21262D),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF30363D)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF7C4DFF).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.auto_awesome_rounded,
+                  color: Color(0xFF7C4DFF),
+                  size: 20,
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            _buildFeatureRow(Icons.local_gas_station, 'Fuel Type', 'Hybrid'),
-            _buildFeatureRow(Icons.settings, 'Transmission', 'Automatic'),
-            _buildFeatureRow(Icons.airline_seat_recline_normal, 'Seats', '5'),
-            _buildFeatureRow(Icons.ac_unit, 'Climate Control', 'Dual Zone'),
-            _buildFeatureRow(Icons.surround_sound, 'Audio System', 'Premium JBL'),
-            _buildFeatureRow(Icons.safety_check, 'Safety Rating', '5 Stars'),
-          ],
-        ),
+              const SizedBox(width: 12),
+              const Text(
+                'Features',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFFF0F6FC),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          _buildFeatureRow(
+            Icons.local_gas_station_rounded,
+            'Fuel Type',
+            'Hybrid',
+          ),
+          _buildFeatureRow(Icons.settings_rounded, 'Transmission', 'Automatic'),
+          _buildFeatureRow(Icons.event_seat_rounded, 'Seats', '5'),
+          _buildFeatureRow(
+            Icons.ac_unit_rounded,
+            'Climate Control',
+            'Dual Zone',
+          ),
+          _buildFeatureRow(
+            Icons.speaker_rounded,
+            'Audio System',
+            'Premium JBL',
+          ),
+          _buildFeatureRow(Icons.shield_rounded, 'Safety Rating', '5 Stars'),
+        ],
       ),
     );
   }
 
   Widget _buildFeatureRow(IconData icon, String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         children: [
-          Icon(
-            icon,
-            size: 20,
-            color: Colors.grey.shade600,
-          ),
+          Icon(icon, size: 20, color: const Color(0xFF8B949E)),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               label,
-              style: Theme.of(context).textTheme.bodyMedium,
+              style: const TextStyle(fontSize: 14, color: Color(0xFF8B949E)),
             ),
           ),
-          Text(
-            value,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w600,
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: const Color(0xFF30363D),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFFF0F6FC),
+              ),
             ),
           ),
         ],
